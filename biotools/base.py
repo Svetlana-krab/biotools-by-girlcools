@@ -13,6 +13,7 @@ class BioFile(ABC):
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self._file:
             self._file.close()
+            self._file = None
             
     @abstractmethod
     def __iter__(self):
@@ -25,4 +26,14 @@ class BioFile(ABC):
 class SequenceFile(BioFile):
     @abstractmethod
     def mean_length(self) -> float:
+        pass
+
+# Новый класс для SAM и VCF
+class GenomicDataReader(BioFile):
+    @abstractmethod
+    def get_chromosomes(self) -> list:
+        pass
+    
+    @abstractmethod
+    def filter_by_region(self, chrom: str, start: int, end: int) -> list:
         pass
