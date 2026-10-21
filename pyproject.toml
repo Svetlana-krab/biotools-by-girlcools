@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biotools"
+version = "1.0.0"
+description = "Чтение и анализ форматов FASTA, FASTQ, SAM и VCF без профильных библиотек"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+    "seaborn>=0.12",
+]
+
+[tool.setuptools]
+packages = ["biotools"]
