@@ -57,4 +57,3 @@ with VcfReader("data/test.vcf") as reader:
     # Поиск вариантов в отрезке
     variants = reader.filter_by_region(chrom="chr1", start=100, end=500)
     print(f"Найдено вариантов в отрезке: {len(variants)}")
-    
