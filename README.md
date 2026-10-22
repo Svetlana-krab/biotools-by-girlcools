@@ -16,7 +16,6 @@
 * `.gitignore` — исключения для Git.
 
 ## Установка и запуск
-
 1. Клонирование и переход в папку:
    git clone https://github.com/Svetlana-krab/biotools-by-girlcools.git
    cd biotools-by-girlcools
