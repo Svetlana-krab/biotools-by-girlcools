@@ -22,11 +22,12 @@
 1. Клонирование и переход в папку:
    git clone https://github.com/Svetlana-krab/biotools-by-girlcools.git
    cd biotools-by-girlcools
-  
-2.Создание виртуального окружения и установка зависимостей:
+2. Создание виртуального окружения и установка зависимостей:
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+3. Запуск демонстрации
+python3 demo.py
 
 Примеры использования
 1. FASTA
@@ -57,11 +58,3 @@ with VcfReader("data/test.vcf") as reader:
     variants = reader.filter_by_region(chrom="chr1", start=100, end=500)
     print(f"Найдено вариантов в отрезке: {len(variants)}")
     
-### Как обновить файл на GitHub:
-1. Откройте `README.md` в вашем редакторе (или в терминале через `nano README.md`).
-2. Замените всё содержимое на текст выше.
-3. Сохраните и отправьте на GitHub:
-   ```bash
-   git add README.md
-   git commit -m "docs: update README with FASTQ and VCF info"
-   git push origin main
