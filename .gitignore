@@ -5,7 +5,3 @@ venv/
 *.egg-info/
 .pytest_cache/
 docs/build/
-data/
-plots/
-!data/test.vcf
-!data/test.fastq
