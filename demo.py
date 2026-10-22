@@ -3,6 +3,7 @@ from biotools.fasta import FastaReader
 from biotools.vcf import VcfReader
 from biotools.fastq import FastqReader
 from itertools import islice
+from biotools.sam import SamReader
 
 def main():
     data_dir = "data"
@@ -46,6 +47,23 @@ def main():
                 print(f"Хромосомы: {reader.get_chromosomes()}")
                 print("Статистика по регионам:")
                 print(reader.get_stats_by_region())
+
+        elif filename.endswith(".sam"):
+            reader = SamReader(filepath)
+            print(f"Это SAM файл.")
+            print(f"Количество выравниваний: {reader.count()}")
+            print(f"Хромосомы: {reader.get_chromosomes()}")
+    
+            print("\nСтатистика по хромосомам:")
+            print(reader.stats_by_chrom())
+    
+            # Проверка пересечения (берем первый регион из первой хромосомы для примера)
+            chroms = reader.get_chromosomes()
+            if chroms:
+                first_chrom = chroms[0]
+                # Ищем выравнивания с 1 по 1000 позицию
+                overlaps = list(reader.intersect(first_chrom, 1, 1000))
+                print(f"\nНайдено пересечений в {first_chrom}:1-1000: {len(overlaps)}")
         
         else:
             print("Неизвестный формат файла.")
