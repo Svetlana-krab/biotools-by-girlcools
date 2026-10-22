@@ -1,6 +1,8 @@
 import os
 from biotools.fasta import FastaReader
 from biotools.vcf import VcfReader
+from biotools.fastq import FastqReader
+from itertools import islice
 
 def main():
     data_dir = "data"
@@ -21,6 +23,21 @@ def main():
                 print(f"Это FASTA файл.")
                 print(f"Количество последовательностей: {reader.count()}")
                 print(f"Средняя длина: {reader.mean_length():.2f}")
+
+        elif filename.endswith(".fastq") or filename.endswith(".fq"):
+            with FastqReader(filepath) as reader:
+                print(f"Это FASTQ файл.")
+                print("\nПервые 2 ряда (работает генератор):")
+                for read_id, seq, qual in islice(reader, 2):
+                    print(" ", read_id, seq[:30] + "...", qual[:30] + "...")
+                print(f"\nКоличество ридов: {reader.count()}")
+                print(f"Средняя длина: {round(reader.mean_length(), 2)}")
+                print("\nСтрою графики...")
+                # Проверяем, существует ли папка plots, если нет - создаем
+                if not os.path.exists("plots"):
+                    os.makedirs("plots")
+                reader.plot_all("plots/")
+                print("Готово: смотрите папку plots/")
 
         elif filename.endswith(".vcf"):
             with VcfReader(filepath) as reader:
