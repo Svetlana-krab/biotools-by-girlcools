@@ -1,12 +1,37 @@
 import pandas
 from .base import GenomicDataReader
-class SamReader(GenomicDataReader): 
-    def __init__(self, filename): 
+
+class SamReader(GenomicDataReader):
+    """
+    Класс для чтения и анализа файлов формата SAM (Sequence Alignment Map).
+    Наследуется от GenomicDataReader.
+    """
+
+    def __init__(self, filename):
+        """
+        Инициализирует ридер SAM.
+
+        Args:
+            filename (str): Путь к SAM-файлу.
+        """
         super().__init__(filename)
+        
     def __iter__(self):
+        """
+        Возвращает генератор для чтения записей (выравниваний).
+
+        Returns:
+            generator: Генератор строк с выравниваниями.
+        """
         return self.read_records()
     
     def get_chromosomes(self) -> list:
+        """
+        Извлекает названия хромосом из заголовков @SQ.
+
+        Returns:
+            list: Список названий хромосом.
+        """
         chromosomes = []
         for line in self.header("@SQ"):
             fields = line.split("\t")
@@ -16,9 +41,26 @@ class SamReader(GenomicDataReader):
         return chromosomes
 
     def filter_by_region(self, chrom: str, start: int, end: int) -> list:
+        """
+        Ищет выравнивания в заданном отрезке.
+
+        Args:
+            chrom (str): Название хромосомы.
+            start (int): Начальная позиция.
+            end (int): Конечная позиция.
+
+        Returns:
+            list: Список строк с выравниваниями.
+        """
         return list(self.intersect(chrom, start, end))
 
     def read_records(self):
+        """
+        Генератор для чтения строк с выравниваниями (пропускает заголовки).
+
+        Yields:
+            str: Строка с выравниванием.
+        """
         with open(self.filename, "r") as file:
             for line in file:
                 if line.startswith("@"):
@@ -27,12 +69,30 @@ class SamReader(GenomicDataReader):
                     continue
                 yield line.rstrip("\n")
 
-    def count(self):
+    def count(self) -> int:
+        """
+        Считает общее количество выравниваний в файле.
+
+        Returns:
+            int: Количество выравниваний.
+        """
         total = 0
         for record in self.read_records():
             total = total + 1
         return total
+
     def header(self, group=None):
+        """
+        Читает заголовки файла (строки, начинающиеся с @).
+
+        Args:
+            group (str, optional): Конкретная группа заголовков (например, "@SQ"). 
+                                   Если не указана, возвращает все группы.
+
+        Returns:
+            dict или list: Если group=None, возвращает словарь со всеми группами.
+                           Если group указана, возвращает список строк этой группы.
+        """
         groups = {}
 
         with open(self.filename, "r") as file:
@@ -54,7 +114,14 @@ class SamReader(GenomicDataReader):
 
         return groups.get(group, [])
 
-    def stats_by_chrom(self):
+    def stats_by_chrom(self) -> pandas.Series:
+        """
+        Собирает статистику по количеству выравниваний на каждой хромосоме.
+        Пропускает несопоставленные чтения (флаг 4).
+
+        Returns:
+            pandas.Series: Серия, где индекс — хромосома, а значение — количество выравниваний.
+        """
         counts = {}
 
         for record in self.read_records():
@@ -70,7 +137,16 @@ class SamReader(GenomicDataReader):
 
         return pandas.Series(counts, dtype="int64", name="alignments")
 
-    def reference_length(self, cigar):
+    def reference_length(self, cigar: str) -> int:
+        """
+        Вычисляет длину выравнивания по эталону на основе строки CIGAR.
+
+        Args:
+            cigar (str): Строка CIGAR (например, "10M2I5M").
+
+        Returns:
+            int: Длина участка на эталонном геноме.
+        """
         length = 0
         number = ""
         for symbol in cigar:
@@ -82,7 +158,18 @@ class SamReader(GenomicDataReader):
                 number = ""
         return length
 
-    def intersect(self, chrom, start, end):
+    def intersect(self, chrom: str, start: int, end: int):
+        """
+        Генератор, который выдает выравнивания, пересекающиеся с заданным регионом.
+
+        Args:
+            chrom (str): Название хромосомы.
+            start (int): Начальная позиция региона.
+            end (int): Конечная позиция региона.
+
+        Yields:
+            str: Строка с выравниванием, которое попало в регион.
+        """
         for record in self.read_records():
             fields = record.split("\t")
 
@@ -101,22 +188,7 @@ class SamReader(GenomicDataReader):
 
             if record_start <= end and record_end >= start:
                 yield record
+
 if __name__ == "__main__":
     reader = SamReader("example.sam") 
     print("Количество записей:", reader.count())
-
-    print("Количество групп:", len(reader.header()))
-    print("Строк @SQ:", len(reader.header("@SQ")))
-    print("Строк @PG:", len(reader.header("@PG")))
-
-    print("Статистика по хромосомам:")
-    print(reader.stats_by_chrom())
-
-    print("Длина по эталону:", reader.reference_length("5M2I3M2D4M"))
-
-    overlap_count = 0
-
-    for record in reader.intersect("1", 100, 30427671):
-        overlap_count = overlap_count + 1
-
-    print("Записей с пересечением:", overlap_count)
