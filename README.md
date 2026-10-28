@@ -25,13 +25,16 @@
     git clone https://github.com/Svetlana-krab/biotools-by-girlcools.git
     cd biotools-by-girlcools
     ```
-    Создание виртуального окружения и установка зависимостей:
+2. Создание виртуального окружения и установка зависимостей:
     ```bash
     python3 -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
     ```
-    Запуск демонстрации:
+3. Запуск демонстрации:
     ```bash
     python demo.py
     ```
+
+## Документация:
+**[Открыть документацию на Github Pages](https://svetlana-krab.github.io/biotools-by-girlcools/)**
